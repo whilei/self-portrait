@@ -1,4 +1,4 @@
-self-portrait
-> take a selfie, set to cron job every 12 minutes
+self-portrait.sh
+> */12 * * * * ~/dev/run-scripts/self-portrait.sh
 
  
