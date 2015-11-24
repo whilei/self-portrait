@@ -3,7 +3,7 @@
 self-portrait.sh
 > selfie script uses [imagesnap](http://iharder.sourceforge.net/current/macosx/imagesnap/)
 
-
+in PHP
 <pre>
 Run a cron job at multiple random times
 Say you want to run a cron job 10 times (or so) in a day at random times.
