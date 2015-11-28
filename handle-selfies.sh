@@ -1,2 +1,9 @@
-rsync -avz --update ~/Pictures/self-portraits/ ~/dev/isaacardis/app/images/
-ruby ~/dev/run-scripts/selfie-handler.rb
+# Update website source from original selfies. 
+rsync -avz --update ~/Pictures/self-portraits/ ~/dev/isaacardis/app/images/selfies
+
+# Create angular constant from all file names. 
+ruby ~/dev/self-portrait/selfie-handler.rb
+
+# resize all pngs in website images to max 140x140. 
+# (originals still at full size in Pictures/)
+# mogrify -resize 140x140 ~/dev/isaacardis/app/images/*.png 
