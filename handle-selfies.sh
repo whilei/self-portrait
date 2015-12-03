@@ -1,5 +1,5 @@
 # Update website source from original selfies. 
-gifme ~/Pictures/self-portraits/*.png -o ~/dev/isaacardis/app/images/gifs/da-gif.gif -w 280 
+gifme ~/Pictures/self-portraits/*.png -o ~/dev/isaacardis/app/images/gifs/da-gif.gif -w 280 -d 10
 rsync -avz --update ~/Pictures/self-portraits/ ~/dev/isaacardis/app/images/selfies
 
 # Create angular constant from all file names. 
