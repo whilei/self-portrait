@@ -1,0 +1,14 @@
+building file list ... done
+./
+.DS_Store
+160112-0806.png
+rsync error: received SIGINT, SIGTERM, or SIGHUP (code 20) at /BuildRoot/Library/Caches/com.apple.xbs/Sources/rsync/rsync-47/rsync/rsync.c(244) [sender=2.6.9]
+building file list ... done
+
+sent 93 bytes  received 20 bytes  45.20 bytes/sec
+total size is 36235204  speedup is 320665.52
+building file list ... done
+selfielist.js
+
+sent 260 bytes  received 192 bytes  180.80 bytes/sec
+total size is 17442  speedup is 38.59
