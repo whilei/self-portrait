@@ -1,1 +1,1 @@
-*/6 * * * * ~/dev/run-scripts/self-portrait.sh
+*/6 * * * * ~/dev/.../self-portrait.sh0 8 * * * ~/dev/.../get-famous.sh
