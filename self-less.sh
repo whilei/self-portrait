@@ -12,15 +12,15 @@ do
   if  [[ $line =~ href=* ]]&&[[ $line =~ png ]]  ;
 then
     png=$(echo "$line"| sed 's/<a href="//'|sed 's/">.*//')
+
     #only get it if not here yet
-    if [ -f "$png" ];
+    if [ -f "$outDir/$png" ];
 		then
  		    echo "File $png exists."
 		else
 			#link it home
    			curl "http://isaacardis.com/selfies/$png" >$outDir/"$png"
 		fi
-    echo "$png"
 fi
 done < <(curl -s "http://isaacardis.com/selfies/?C=M;O=D")
 
