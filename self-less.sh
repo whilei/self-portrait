@@ -29,7 +29,7 @@ done < <(curl -s "http://isaacardis.com/selfies/?C=M;O=D")
 selflessMovie=$outDir/selfless.mp4
 
 #brew install ffmpeg
-ffmpeg -framerate 10 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p $selflessMovie
+ffmpeg -framerate 4 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p $selflessMovie
 
 #now upload that sucker to youtube... check out https://github.com/tokland/youtube-upload
 #- has some menial work to upload
