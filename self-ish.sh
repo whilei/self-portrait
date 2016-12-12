@@ -4,11 +4,12 @@
 # 
 # TODO: argue name of out file
 
+# -m
 avg_method='evalseq' # default -evaluate-sequence mean
-	#'evalseqtp' # set transparent background for -evaluate-sequence mean (possible best for face-detectored)
-	#'recurfx' # one-by-one recurs custom -fx strategy per stephan pauker (see comm below)
+	#-M 'evalseqtp' # set transparent background for -evaluate-sequence mean (possible best for face-detectored)
+	#-r 'recurfx' # one-by-one recurs custom -fx strategy per stephan pauker (see comm below)
 	  # takes forever. is less likely to break the compbrain.
-	#'recurfxfit' # same as one-by-one but uses a tmp file to resize before
+	#-R 'recurfxfit' # same as one-by-one but uses a tmp file to resize before
 		#	may be best for averaging cropped faces
 
 while getopts ':mMrR' opt; do
@@ -33,7 +34,7 @@ while getopts ':mMrR' opt; do
 			shift
 			;;
 		\?)
-			echo "Use: ./self-ish.sh -[|m|M|r] path/to/selfies/dir out/dir" 
+			echo "Use: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir" 
 			exit 1;
 			;;
 		*)
@@ -73,6 +74,7 @@ if [[ "$avg_method" == recurfx ]]; then
 		fi
 	done
 
+# Best one for cropped faces.
 elif [[ "$avg_method" == recurfxfit ]]; then
 
 	selfies=($(find "$selfies_dir" -type f))
