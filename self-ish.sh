@@ -5,7 +5,7 @@
 # TODO: argue name of out file
 
 avg_method='evalseq' # default -evaluate-sequence mean
-					#'evalseqtp' # set transparent background for -evaluate-sequence mean
+					#'evalseqtp' # set transparent background for -evaluate-sequence mean (possible best for face-detectored)
 					#'recurfx' # one-by-one recurs custom -fx strategy per stephan pauker (see comm below)
 										 # takes forever. is less likely to break the compbrain.
 
@@ -67,8 +67,10 @@ if [[ "$avg_method" == recurfx ]]; then
 elif [[ "$avg_method" == evalseqtp ]]; then
 	echo "Output average file will be $out_dir/self-ish-esmean-bgtrans.png"
 	# http://blog.patdavid.net/2012/08/imagemagick-average-blending-files.html
-	# # #-gravity center -extent 1728x1728 \ # since they all same size (can use for face-detected selfie tho)
+	
+	# since they all same size (can use for face-detected selfie tho)
 	convert -background transparent "$selfies_dir/*.png" \
+	-gravity center -extent 640x480 \
 	-evaluate-sequence mean \
 	"$out_dir/self-ish-esmean-bgtrans.png"
 else

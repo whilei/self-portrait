@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lazywei/go-opencv/opencv"
+	opencv "github.com/lazywei/go-opencv/opencv"
 )
 
 //Find the files in input directory wanted
@@ -66,10 +66,10 @@ func main() {
 	var filetype string
 	var harrcascade string
 
-	flag.StringVar(&dirIn, "dirIn", "./selfless/", "input directory holding selfies")
-	flag.StringVar(&dirOut, "dirOut", "./selfmore/", "output directory")
+	flag.StringVar(&dirIn, "dirIn", "/Users/ia/Pictures/self-portraits/", "input directory holding selfies")
+	flag.StringVar(&dirOut, "dirOut", "/Users/ia/Pictures/self-portraits-detected/", "output directory")
 	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
-	flag.StringVar(&harrcascade, "harrcascade", "/Users/Kitty/Go/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
+	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
 
 	flag.Parse()
 
