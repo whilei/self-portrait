@@ -3,7 +3,7 @@ Keepin it candid:
 Cron calls selfie script every 6 minutes.
 Selfie script only executes half the time and pauses randomly between 1 second and 12 minutes.
 
-All are available [here](http://isaacardis.com/selfies/?C=M;O=D).
+All selfies are available [here](http://isaacardis.com/selfies/?C=M;O=D).
 
 > [randomness reference](http://www.nightbluefruit.com/blog/2009/03/run-a-cron-job-at-multiple-random-times/)
 
