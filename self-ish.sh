@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# Usage: ./self-ish.sh -[|m|M|r] path/to/selfies/dir out/dir
+# Usage: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir
 # 
 # TODO: argue name of out file
 
 avg_method='evalseq' # default -evaluate-sequence mean
-					#'evalseqtp' # set transparent background for -evaluate-sequence mean (possible best for face-detectored)
-					#'recurfx' # one-by-one recurs custom -fx strategy per stephan pauker (see comm below)
-										 # takes forever. is less likely to break the compbrain.
+	#'evalseqtp' # set transparent background for -evaluate-sequence mean (possible best for face-detectored)
+	#'recurfx' # one-by-one recurs custom -fx strategy per stephan pauker (see comm below)
+	  # takes forever. is less likely to break the compbrain.
+	#'recurfxfit' # same as one-by-one but uses a tmp file to resize before
+		#	may be best for averaging cropped faces
 
-while getopts ':mMr' opt; do
+while getopts ':mMrR' opt; do
 	case $opt in
 		m)
 			# default
@@ -23,6 +25,11 @@ while getopts ':mMr' opt; do
 		r)
 			echo "Using one-by-one recursive -fx strategy."
 			avg_method='recurfx'
+			shift
+			;;
+		R)
+			echo "Using one-by-one recursive -fx strategy with fit"
+			avg_method='recurfxfit'
 			shift
 			;;
 		\?)
@@ -53,31 +60,66 @@ if [[ "$avg_method" == recurfx ]]; then
 	# IFS=$(echo -en "\n\b") # Use newline instead of spaces.
 	i=0
 	for file in "${selfies[@]}"; do
-	  echo "Averaging $file into $out_file"
-	  if [ $i -eq 0 ]; then
-	    cp "$file" "$out_dir/self-ish-recurfx.png"
-	  else
-	    # u is first image in list
-	    # v is second
-	    convert "$file" "$out_file" -fx "(u+$i*v)/$((i+1))" "$out_file"
-	  fi
-	  i=$((i+1))
+		if [[ $file =~ .png ]]; then
+		  echo "Averaging $file into $out_file"
+		  if [ $i -eq 0 ]; then
+		    cp "$file" "$out_dir/self-ish-recurfx.png"
+		  else
+		    # u is first image in list
+		    # v is second
+		    convert "$file" "$out_file" -fx "(u+$i*v)/$((i+1))" "$out_file"
+		  fi
+		  i=$((i+1))
+		fi
 	done
 
+elif [[ "$avg_method" == recurfxfit ]]; then
+
+	selfies=($(find "$selfies_dir" -type f))
+	
+	out_file="$out_dir/self-ish-recurfxfit.png"
+	echo "Output average file will be $out_file"
+
+	i=0
+	for file in "${selfies[@]}"; do
+		if [[ $file =~ .png ]]; then
+			echo "Averaging $file into $out_file"
+			if [ $i -eq 0 ]; then
+				convert "$file" -background transparent -gravity center -resize 640x480 "$out_file"
+			else
+			  convert "$file" -background transparent -gravity center -resize 640x480 resized_tmp_file.png
+			  convert resized_tmp_file.png "$out_file" -fx "(u+$i*v)/$((i+1))" "$out_file"
+			  rm resized_tmp_file.png
+			fi
+			i=$((i+1))
+		fi
+	done
+
+# Be advised this reads all files into mem.
+# Memory an issue? For 10k+ files, likely.
+# Try: -limit memory 16mb -limit map 32mb
 elif [[ "$avg_method" == evalseqtp ]]; then
 	echo "Output average file will be $out_dir/self-ish-esmean-bgtrans.png"
 	# http://blog.patdavid.net/2012/08/imagemagick-average-blending-files.html
 	
-	# since they all same size (can use for face-detected selfie tho)
-	convert -background transparent "$selfies_dir/*.png" \
-	-gravity center -extent 640x480 \
+	# background, resize, extent, and gravity will make face-cropped selfies consistently sized.
+	# since all faces are smaller than original image, faces will be resized to fit within
+	# resize will not FILL the space, they will FIT INTO the requested size
+	convert "$selfies_dir/*.png" \
+	-background transparent \
+	-gravity center \
+	-resize 640x480 \
+	-extent 640x480 \
 	-evaluate-sequence mean \
 	"$out_dir/self-ish-esmean-bgtrans.png"
 else
-	# be advised this reads all files into mem
+	
 	echo "Using default 'convert -evaluate-sequence mean'."
 	echo "Output average file will be $out_dir/self-ish-esmean.png"
-	convert "$selfies_dir/*.png" -evaluate-sequence mean "$out_dir/self-ish-esmean.png"	
+	
+	convert "$selfies_dir/*.png" \
+	-evaluate-sequence mean \
+	"$out_dir/self-ish-esmean.png"	
 fi
 
 # sources
