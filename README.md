@@ -8,10 +8,6 @@ Selfie script only executes half the time and pauses randomly between 1 second a
 
 All selfies are available [here](http://isaacardis.com/selfies/?C=M;O=D).
 
-> [randomness reference](http://www.nightbluefruit.com/blog/2009/03/run-a-cron-job-at-multiple-random-times/)
-
-> selfie script uses [imagesnap](http://iharder.sourceforge.net/current/macosx/imagesnap/)
-
 ### Dependencies
 ```shell
 $ brew install imagesnap # self-portrait.sh
