@@ -1,6 +1,8 @@
 package main
 
 // lil bullet and detectomatic selfies
+// TODO: get it a cron to do it on the server
+
 import (
 	"flag"
 	"fmt"

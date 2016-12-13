@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # Usage: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir
-# 
+#
 # TODO: argue name of out file
+# TODO: average by time period (month, year, decade)
+# TODO: keep track of which files were used to make a given average,
+# so work can be not redundant and build always something new from what already exists
 
 # -m
 avg_method='evalseq' # default -evaluate-sequence mean
@@ -34,11 +37,11 @@ while getopts ':mMrR' opt; do
 			shift
 			;;
 		\?)
-			echo "Use: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir" 
+			echo "Use: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir"
 			exit 1;
 			;;
 		*)
-			echo "Doing star thingey." 
+			echo "Doing star thingey."
 			exit 1
 			;;
 	esac
@@ -78,7 +81,7 @@ if [[ "$avg_method" == recurfx ]]; then
 elif [[ "$avg_method" == recurfxfit ]]; then
 
 	selfies=($(find "$selfies_dir" -type f))
-	
+
 	out_file="$out_dir/self-ish-recurfxfit.png"
 	echo "Output average file will be $out_file"
 
@@ -103,7 +106,7 @@ elif [[ "$avg_method" == recurfxfit ]]; then
 elif [[ "$avg_method" == evalseqtp ]]; then
 	echo "Output average file will be $out_dir/self-ish-esmean-bgtrans.png"
 	# http://blog.patdavid.net/2012/08/imagemagick-average-blending-files.html
-	
+
 	# background, resize, extent, and gravity will make face-cropped selfies consistently sized.
 	# since all faces are smaller than original image, faces will be resized to fit within
 	# resize will not FILL the space, they will FIT INTO the requested size
@@ -115,13 +118,13 @@ elif [[ "$avg_method" == evalseqtp ]]; then
 	-evaluate-sequence mean \
 	"$out_dir/self-ish-esmean-bgtrans.png"
 else
-	
+
 	echo "Using default 'convert -evaluate-sequence mean'."
 	echo "Output average file will be $out_dir/self-ish-esmean.png"
-	
+
 	convert "$selfies_dir/*.png" \
 	-evaluate-sequence mean \
-	"$out_dir/self-ish-esmean.png"	
+	"$out_dir/self-ish-esmean.png"
 fi
 
 # sources

@@ -1,4 +1,7 @@
-# Take a selfie as a cron job.
+![Face average beginning (~201511xx) ->
+20161212](./face_averages/self-ish-recurfxfit.png)
+
+## Take a selfie as a cron job.
 Keepin it candid:
 Cron calls selfie script every 6 minutes.
 Selfie script only executes half the time and pauses randomly between 1 second and 12 minutes.
