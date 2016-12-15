@@ -1,5 +1,7 @@
 ![Face average beginning (~201511xx) ->
 20161212](./face_averages/self-ish-recurfxfit.png)
+![Original average beginning (~201511xx) ->
+20161215](./original_averages/self-ish-recurfxfit.png)
 
 ## Take a selfie as a cron job.
 Keepin it candid:
