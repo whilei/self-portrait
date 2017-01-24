@@ -9,5 +9,7 @@ then
 # sleep randomly bewteen 1s and 12m
 s=$(( ( RANDOM % 720 )  + 1 ))
 sleep $s
-imagesnap ~/Pictures/self-portraits/$(date +%y%m%d)-$(date +%H%M).png
+d="$(date +%y%m%d)-$(date +%H%M).png"
+imagesnap ~/Pictures/self-portraits/$d
+screencapture -x ~/Pictures/self-screenshots/sc$d
 fi
