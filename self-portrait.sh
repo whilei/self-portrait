@@ -11,5 +11,5 @@ s=$(( ( RANDOM % 720 )  + 1 ))
 sleep $s
 d="$(date +%y%m%d)-$(date +%H%M).png"
 imagesnap ~/Pictures/self-portraits/$d
-screencapture -x ~/Pictures/self-screenshots/sc$d
+# screencapture -x ~/Pictures/self-screenshots/sc$d
 fi
