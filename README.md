@@ -1,8 +1,3 @@
-![Face average beginning (~201511xx) ->
-20161212](./face_averages/self-ish-recurfxfit.png)
-![Original average beginning (~201511xx) ->
-20161215](./original_averages/self-ish-recurfxfit.png)
-
 ## Take a selfie as a cron job.
 Keepin it candid:
 Cron calls selfie script every 6 minutes.
@@ -17,3 +12,11 @@ $ brew install imagemagick # self-ish.sh
 $ brew install opencv # detect.go
 $ go get -v github.com/lazywei/go-opencv # detect.og
 ```
+Average face I make over the course of about a year:
+![Face average beginning (~201511xx) ->
+20161212](./face_averages/self-ish-recurfxfit.png)
+
+Average picture of the same course (not auto-face-detect-cropped):
+![Original average beginning (~201511xx) ->
+20161215](./original_averages/self-ish-recurfxfit.png)
+
