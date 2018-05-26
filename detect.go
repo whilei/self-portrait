@@ -132,10 +132,6 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 
 		//image := opencv.LoadImage(element)
 		imageMat := gocv.IMRead(element, gocv.IMReadColor)
-		//if image == nil {
-		//	panic("Loading Image " + element + "failed")
-		//}
-		// defer image.Release()
 		if imageMat.Empty() {
 			log.Println("empty image, skipping", element)
 			continue
@@ -174,42 +170,7 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 			if err != nil {
 				panic(err)
 			}
-		//	if face.Cols() == 0 {
-		//		log.Println("no cols, skipping")
-		//		continue
-		//	}
-		//	if face.Rows() == 0 {
-		//		log.Println("no rows, skippingg")
-		//		continue
-		//	}
-		//	if len(face.ToBytes()) == 0 {
-		//		log.Println("no bytes, skipping")
-		//		continue
-		//	}
-		//
-		//	//bs := face.ToBytes()
-		//
-		////panic: runtime error: index out of range
-		////
-		////	goroutine 1 [running]:
-		////	gocv.io/x/gocv.(*Mat).ToImage(0xc420055ce0, 0xc4200b6000, 0x1b000, 0x1b000, 0x160)
-		////	/Users/ia/gocode/src/gocv.io/x/gocv/core.go:497 +0x6dc
-		////	main.cropFaces(0xc4200aa200, 0x11, 0x20, 0x4139882, 0x2b, 0x413a9ff, 0x59)
-		////	/Users/ia/dev/self-portrait/detect.go:174 +0x826
-		////	main.main()
-		////	/Users/ia/dev/self-portrait/detect.go:236 +0x304
-		////	exit status 2
-		//
-		//	img, err := face.ToImage()
-		//	if err != nil {
-		//		log.Println("err", err)
-		//	}
 			toimg, _ := os.Create(outPath)
-			//img, _, err := image.Decode(bytes.NewReader(bs))
-			//if err != nil {
-			//	log.Println("image decode err", err)
-			//	continue
-			//}
 			if err := png.Encode(toimg, croppedImg); err != nil {
 				log.Println("err encoding png", err)
 			}
@@ -220,27 +181,6 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 			}
 
 		}
-		//cascade := opencv.LoadHaarClassifierCascade(harrcascade)
-		//faces := cascade.DetectObjects(image)
-		//if len(faces) == 0 {
-		//	fmt.Printf("Found no face in %s\n", element)
-		//	image.Release()
-		//	continue
-		//}
-		//
-		//for _, value := range faces {
-		//	//Some invalid stuff filtering
-		//	if value.Width() < image.Width() && value.Height() < image.Height() && value.Width() > 0 && value.Height() > 0 {
-		//		//crop out the face
-		//		crop := opencv.Crop(image, value.X(), value.Y(), value.Width(), value.Height())
-		//		//save cropped
-		//		opencv.SaveImage(outPath, crop, []int{0})
-		//		crop.Release()
-		//	} else {
-		//		fmt.Printf("Couldn't save: %s", value)
-		//	}
-		//}
-		//image.Release()
 	}
 }
 
