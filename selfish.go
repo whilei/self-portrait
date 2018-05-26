@@ -34,8 +34,8 @@ func getDifferentFiles(listA, listB []string) (diff []difflib.DiffRecord) {
 func getUniqueOriginals(dirIn, dirOut, filetype string) []string {
 
 	// get file list from originals
-	originals := GetFiles(dirIn, ".png")
-	faces := GetFiles(dirOut, ".png")
+	originals := getFiles(dirIn, ".png")
+	faces := getFiles(dirOut, ".png")
 	var originalsStripped = make([]string, len(originals))
 	var facesStripped = make([]string, len(faces))
 

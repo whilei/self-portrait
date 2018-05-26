@@ -105,13 +105,15 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 		if image == nil {
 			panic("Loading Image " + element + "failed")
 		}
-		defer image.Release()
+		// defer image.Release()
 
 		//detect some faces
 		cascade := opencv.LoadHaarClassifierCascade(harrcascade)
 		faces := cascade.DetectObjects(image)
 		if len(faces) == 0 {
 			fmt.Printf("Found no face in %s\n", element)
+			image.Release()
+			continue
 		}
 
 		for _, value := range faces {
@@ -120,12 +122,13 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 				//crop out the face
 				crop := opencv.Crop(image, value.X(), value.Y(), value.Width(), value.Height())
 				//save cropped
-				opencv.SaveImage(outPath, crop, 0)
+				opencv.SaveImage(outPath, crop, []int{0})
 				crop.Release()
 			} else {
 				fmt.Printf("Couldn't save: %s", value)
 			}
 		}
+		image.Release()
 	}
 }
 
