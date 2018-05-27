@@ -4,18 +4,27 @@ package main
 // TODO: get it a cron to do it on the server
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
+	"image"
 	"log"
 	"os"
 	"path/filepath"
 
-	"github.com/aryann/difflib"
-	"gocv.io/x/gocv"
-	"github.com/oliamb/cutter"
 	"image/png"
+
+	"github.com/aryann/difflib"
+	"github.com/oliamb/cutter"
+	"gocv.io/x/gocv"
 )
+
+var dirIn string
+var dirOut string
+var filetype string
+var harrcascade string
+var knownEmptyStore string
 
 // Exists reports whether the named file or directory exists.
 // apparently this can be wrong if permissions or something else thangle with it, would say true when not
@@ -31,23 +40,6 @@ func exists(name string) bool {
 //Find the files in input directory wanted
 func getFiles(dirIn string, filetype string) (files []string) {
 	fmt.Printf("Finding %s files in %s\n", filetype, dirIn)
-
-	//fs, e := ioutil.ReadDir(dirIn)
-	//if e != nil {
-	//	panic(e)
-	//}
-	//for _, f := range fs {
-	//	if f.IsDir() {
-	//		continue
-	//	}
-	//	n := f.Name()
-	//	if filepath.Ext(n) != filetype {
-	//		continue
-	//	}
-	//	files = append(files, n)
-	//}
-	//return
-
 	files, err := filepath.Glob(dirIn + "*" + filetype)
 	if err != nil {
 		log.Fatal(err)
@@ -106,6 +98,58 @@ func getUniqueOriginals(dirIn, dirOut, filetype string) []string {
 	return uniques
 }
 
+func readFileLinesToStrSlice(fpath string) (out []string) {
+	file, err := os.Open(fpath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if scanner.Text() == "" || len(scanner.Text()) < 4 {
+			continue
+		}
+		out = append(out, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return out
+}
+
+var faceCropScale = 33 // percent bigger
+func enlargeCrop(rect image.Rectangle, maxCols, maxRows int) (nanchor image.Point, ncols, nrows int) {
+	width, height := (rect.Max.X - rect.Min.X), (rect.Max.Y - rect.Min.Y)
+	ncols = width * (100 + faceCropScale) / 100
+	nrows = width * (100 + faceCropScale) / 100
+
+	// adjust anchor (top left == rect Min) given scaled rect size
+	x, y := rect.Min.X, rect.Min.Y
+	x = x - ((ncols - width) / 2)
+	y = y - ((nrows - height) / 2)
+
+	// ensure fit within max bounds
+	if x < 0 {
+		x = 0
+	}
+	if y < 0 {
+		y = 0
+	}
+	if x+ncols > maxCols {
+		ncols = maxCols - x
+	}
+	if y+nrows > maxRows {
+		nrows = maxRows - y
+	}
+	nanchor = image.Point{
+		X: x,
+		Y: y,
+	}
+	return
+}
+
 //detects faces and crops em out
 func cropFaces(inputs []string, dirOut string, harrcascade string) {
 	err := os.MkdirAll(dirOut, 0777) // makes dir if not exists
@@ -124,22 +168,76 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 		fmt.Printf("Error reading cascade file: %v\n", harrcascade)
 		return
 	}
+	// track files without faces to check against
+	// removes a string from string slice if it exists in the slice
+	// this "widdles" the size of the in-memory known-no-faces list as previously checked files are referenced
+	// Since order is preserved, it should be relatively fast.
+	containsWiddle := func(sl []string, s string) ([]string, bool) {
+		for i, ss := range sl {
+			if ss == s {
+				sl = append(sl[:i], sl[i+1:]...)
+				return sl, true
+			}
+		}
+		return sl, false
+	}
+	nofaceslistfilePath := filepath.Clean(knownEmptyStore)
+	var nofaces []string
+	if _, e := os.Stat(nofaceslistfilePath); e == nil {
+		nofaces = readFileLinesToStrSlice(nofaceslistfilePath)
+	} else if os.IsNotExist(e) {
+		// simulate touch
+		if f, e := os.Create(nofaceslistfilePath); e != nil {
+			panic(e)
+		} else {
+			f.Close()
+		}
+	}
 
-	for _, element := range inputs {
+	nofaceFile, err := os.OpenFile(nofaceslistfilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer nofaceFile.Close()
+
+	l := len(inputs)
+	for i, element := range inputs {
 
 		outPath := dirOut + "face_" + filepath.Base(element)
-		fmt.Println("facifying", outPath)
+		fmt.Println(i+1, "/", l, ":", element)
 
-		//image := opencv.LoadImage(element)
+		var has bool
+		nofaces, has = containsWiddle(nofaces, element)
+		if has {
+			log.Println("known haz no face, skipping")
+			continue
+		}
+
 		imageMat := gocv.IMRead(element, gocv.IMReadColor)
 		if imageMat.Empty() {
 			log.Println("empty image, skipping", element)
+			if _, has := containsWiddle(nofaces, element); !has {
+				nofaceFile.WriteString(element + "\n")
+			}
 			continue
 		}
+
+		// check to see if completely black image.
+		// sometimes this happens because my computer doesn't go to sleep correctly when connected to external monitor
+		// ... and sometimes it's just dark
+		// scal := imageMat.Mean()
+		// if scal.Val1 < 10 && scal.Val2 < 10 && scal.Val3 < 10 {
+		// 	log.Println("dark image, skipping")
+		// 	noface.WriteString(element)
+		// 	continue
+		// }
 
 		rects := classifier.DetectMultiScale(imageMat)
 		if len(rects) == 0 {
 			log.Println("no faces detected")
+			if _, has := containsWiddle(nofaces, element); !has {
+				nofaceFile.WriteString(element + "\n")
+			}
 			continue
 		}
 		fs, err := os.Open(element)
@@ -161,10 +259,12 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 				log.Println("empty face")
 				continue
 			}
+			// don't chop the chin off
+			a, w, h := enlargeCrop(rect, imageMat.Cols(), imageMat.Rows())
 			croppedImg, err := cutter.Crop(pngF, cutter.Config{
-				Width:  face.Cols(),
-				Height: face.Rows(),
-				Anchor: rect.Min,
+				Width:  w,
+				Height: h,
+				Anchor: a,
 				Mode:   cutter.TopLeft, // optional, default value
 			})
 			if err != nil {
@@ -173,13 +273,14 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 			toimg, _ := os.Create(outPath)
 			if err := png.Encode(toimg, croppedImg); err != nil {
 				log.Println("err encoding png", err)
+			} else {
+				log.Println("->", outPath)
 			}
 			toimg.Close()
 			if err != nil {
 				log.Println("err writing face bytes", err)
 				os.Remove(outPath)
 			}
-
 		}
 	}
 }
@@ -190,15 +291,11 @@ func main() {
 
 	fmt.Printf("Program Name: %s\n", cmd)
 
-	var dirIn string
-	var dirOut string
-	var filetype string
-	var harrcascade string
-
 	flag.StringVar(&dirIn, "dirIn", "/Users/ia/dev/self-portrait/original_examples/", "input directory holding selfies")
 	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/faces_examples/", "output directory")
 	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
 	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
+	flag.StringVar(&knownEmptyStore, "empty", "/Users/ia/dev/self-portrait/knownnofaces", "file in which to store list of known no-face images")
 
 	flag.Parse()
 
