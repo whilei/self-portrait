@@ -291,11 +291,11 @@ func main() {
 
 	fmt.Printf("Program Name: %s\n", cmd)
 
-	flag.StringVar(&dirIn, "dirIn", "/Users/ia/dev/self-portrait/original_examples/", "input directory holding selfies")
-	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/faces_examples/", "output directory")
+	flag.StringVar(&dirIn, "dirIn", "/Users/ia/dev/self-portrait/data/examples/originals/", "input directory holding selfies")
+	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/data/examples/faces/", "output directory")
 	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
 	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
-	flag.StringVar(&knownEmptyStore, "empty", "/Users/ia/dev/self-portrait/knownnofaces", "file in which to store list of known no-face images")
+	flag.StringVar(&knownEmptyStore, "empty", "/Users/ia/dev/self-portrait/data/knownnofaces", "file in which to store list of known no-face images")
 
 	flag.Parse()
 
