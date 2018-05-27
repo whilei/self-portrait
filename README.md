@@ -26,6 +26,8 @@ Average face-detected-and-cropped images by month since cron installed in Novemb
 | 16-11 | ![16-11](./calendar/16-11.avg-recurfxfit.png) |
 | 16-12 | ![16-12](./calendar/16-12.avg-recurfxfit.png) |
 | 17-01 | ![17-01](./calendar/17-01.avg-recurfxfit.png) |
+| 17-02 | ![17-02](./calendar/17-02.avg-recurfxfit.png) |
+| 17-03 | ![17-03](./calendar/17-03.avg-recurfxfit.png) |
 
 
 ### Dependencies
