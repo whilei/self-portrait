@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+#goal is to create a time travel vid of the selfies
+outDir="selfless"
+if [ $# -gt 0 ]; then
+    outDir="$1"
+fi
+if [ ! -d "$outDir" ]; then
+  echo "Selfies dir [$outDir] not found."
+  exit 1;
+fi
+
+#Now a movie maker
+#- has some menial work 
+brew install ffmpeg
+#-framerate is the number of frames per second...
+#Not sure if the glob is globbing in perfect order yet...but looks like there are options to do that
+# the -vf flag fixes error if image size (eg. 177x177) is not divisible by zero
+ffmpeg -framerate 6 -pattern_type glob -i '*.png' -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -pix_fmt yuv420p out.mp4
+# re-scale varsion
+#ffmpeg -framerate 6 -pattern_type glob -i '*.png' -c:v libx264 -pix_fmt yuv420p -vf "scale=300:300,format=yuv420p" out.mp4 
+
+#now upload that sucker to youtube... check out https://github.com/tokland/youtube-upload
+#youtube-upload --title="selfless" --client-secrets $outDir/client_secrets.json out.mp4
