@@ -11,21 +11,21 @@ Average face-detected-and-cropped images by month since cron installed in Novemb
 
 | YY-MM | avg image (recursive avg fit) |
 | --- | --- |
-| 15-11 | ./calendar/15-11.avg-recurfxfit.png |
-| 15-12 | ./calendar/15-12.avg-recurfxfit.png |
-| 16-01 | ./calendar/16-01.avg-recurfxfit.png |
-| 16-02 | ./calendar/16-02.avg-recurfxfit.png |
-| 16-03 | ./calendar/16-03.avg-recurfxfit.png |
-| 16-04 | ./calendar/16-04.avg-recurfxfit.png |
-| 16-05 | ./calendar/16-05.avg-recurfxfit.png |
-| 16-06 | ./calendar/16-06.avg-recurfxfit.png |
-| 16-07 | ./calendar/16-07.avg-recurfxfit.png |
-| 16-08 | ./calendar/16-08.avg-recurfxfit.png |
-| 16-09 | ./calendar/16-09.avg-recurfxfit.png |
-| 16-10 | ./calendar/16-10.avg-recurfxfit.png |
-| 16-11 | ./calendar/16-11.avg-recurfxfit.png |
-| 16-12 | ./calendar/16-12.avg-recurfxfit.png |
-| 17-01 | ./calendar/17-01.avg-recurfxfit.png |
+| 15-11 | ![15-11](./calendar/15-11.avg-recurfxfit.png) |
+| 15-12 | ![15-12](./calendar/15-12.avg-recurfxfit.png) |
+| 16-01 | ![16-01](./calendar/16-01.avg-recurfxfit.png) |
+| 16-02 | ![16-02](./calendar/16-02.avg-recurfxfit.png) |
+| 16-03 | ![16-03](./calendar/16-03.avg-recurfxfit.png) |
+| 16-04 | ![16-04](./calendar/16-04.avg-recurfxfit.png) |
+| 16-05 | ![16-05](./calendar/16-05.avg-recurfxfit.png) |
+| 16-06 | ![16-06](./calendar/16-06.avg-recurfxfit.png) |
+| 16-07 | ![16-07](./calendar/16-07.avg-recurfxfit.png) |
+| 16-08 | ![16-08](./calendar/16-08.avg-recurfxfit.png) |
+| 16-09 | ![16-09](./calendar/16-09.avg-recurfxfit.png) |
+| 16-10 | ![16-10](./calendar/16-10.avg-recurfxfit.png) |
+| 16-11 | ![16-11](./calendar/16-11.avg-recurfxfit.png) |
+| 16-12 | ![16-12](./calendar/16-12.avg-recurfxfit.png) |
+| 17-01 | ![17-01](./calendar/17-01.avg-recurfxfit.png) |
 
 
 ### Dependencies
