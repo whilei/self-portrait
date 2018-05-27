@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Usage: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/dir
+# Usage: ./self-ish.sh -[|m|M|r|R] path/to/selfies/dir out/file.png
 #
 # TODO: argue name of out file
 # TODO: average by time period (month, year, decade)
@@ -48,8 +48,7 @@ while getopts ':mMrR' opt; do
 done
 
 selfies_dir=$1
-out_dir=$2
-mkdir -p "$out_dir"
+out_file=$2
 
 echo "Using selfies from $selfies_dir"
 
@@ -58,16 +57,16 @@ if [[ "$avg_method" == recurfx ]]; then
 	# fix recurs avg?
 	# http://stephan.paukner.cc/syslog/archives/362-Averaging-an-image-sequence-with-ImageMagick.html
 	selfies=($(find "$selfies_dir" -type f))
-	out_file="$out_dir/self-ish-recurfx.png"
 	echo "Output average file will be $out_file"
 	# SAVEIFS=$IFS
 	# IFS=$(echo -en "\n\b") # Use newline instead of spaces.
 	i=0
+	len=${#selfies[@]}
 	for file in "${selfies[@]}"; do
 		if [[ $file =~ .png ]]; then
-		  echo "Averaging $file into $out_file"
+		  echo "$i/$len - averaging $file into $out_file"
 		  if [ $i -eq 0 ]; then
-		    cp "$file" "$out_dir/self-ish-recurfx.png"
+		    cp "$file" "$out_file"
 		  else
 		    # u is first image in list
 		    # v is second
@@ -82,13 +81,13 @@ elif [[ "$avg_method" == recurfxfit ]]; then
 
 	selfies=($(find "$selfies_dir" -type f))
 
-	out_file="$out_dir/self-ish-recurfxfit.png"
 	echo "Output average file will be $out_file"
 
 	i=0
+	len=${#selfies[@]}
 	for file in "${selfies[@]}"; do
 		if [[ $file =~ .png ]]; then
-			echo "Averaging $file into $out_file"
+		  	echo "$i/$len - averaging $file into $out_file"
 			if [ $i -eq 0 ]; then
 				convert "$file" -background transparent -gravity center -resize 640x480 "$out_file"
 			else
@@ -104,7 +103,7 @@ elif [[ "$avg_method" == recurfxfit ]]; then
 # Memory an issue? For 10k+ files, likely.
 # Try: -limit memory 16mb -limit map 32mb
 elif [[ "$avg_method" == evalseqtp ]]; then
-	echo "Output average file will be $out_dir/self-ish-esmean-bgtrans.png"
+	echo "Output average file will be $out_file"
 	# http://blog.patdavid.net/2012/08/imagemagick-average-blending-files.html
 
 	# background, resize, extent, and gravity will make face-cropped selfies consistently sized.
@@ -116,15 +115,15 @@ elif [[ "$avg_method" == evalseqtp ]]; then
 	-resize 640x480 \
 	-extent 640x480 \
 	-evaluate-sequence mean \
-	"$out_dir/self-ish-esmean-bgtrans.png"
+	"$out_file"
 else
 
 	echo "Using default 'convert -evaluate-sequence mean'."
-	echo "Output average file will be $out_dir/self-ish-esmean.png"
+	echo "Output average file will be $out_file"
 
 	convert "$selfies_dir/*.png" \
 	-evaluate-sequence mean \
-	"$out_dir/self-ish-esmean.png"
+	"$out_file"
 fi
 
 # sources
