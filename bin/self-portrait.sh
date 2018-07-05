@@ -9,7 +9,7 @@ then
 # sleep randomly bewteen 1s and 12m
 s=$(( ( RANDOM % 720 )  + 1 ))
 sleep $s
-d="$(date +%y%m%d)-$(date +%H%M).jpeg"
+d="$(date +%y%m%d)-$(date +%H%M).png"
 
 # osx
 # imagesnap ~/Pictures/self-portraits/$d
@@ -18,6 +18,6 @@ d="$(date +%y%m%d)-$(date +%H%M).jpeg"
 # screencapture -x ~/Pictures/self-screenshots/sc$d
 
 # linux
-/usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --jpeg -1 -D 0 -F 1 $HOME/Pictures/self-portraits/$d
+/usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 $HOME/Pictures/self-portraits/$d
 
 fi
