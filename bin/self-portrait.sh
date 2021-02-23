@@ -18,6 +18,6 @@ d="$(date +%y%m%d)-$(date +%H%M).png"
 # screencapture -x ~/Pictures/self-screenshots/sc$d
 
 # linux
-/usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 $HOME/Pictures/self-portraits/$d
+/usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 $HOME/Pictures/self-portraits2/$d
 
 fi
