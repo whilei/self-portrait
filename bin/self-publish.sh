@@ -4,6 +4,6 @@
 #rsync -avz --update ~/dev/isaacardis/app/images/gifs/ freya:~/isaacardis/images/gifs/
 #rsync -avz --update ~/dev/isaacardis/app/scripts/services/selfielist.js freya:~/isaacardis/scripts/services/selfielist.js
 
-rsync -avz --update ~/Pictures/self-portraits/ freya:~/isaacardis.com/selfies/ 
-rsync -avz --update ~/Pictures/self-portraits2/ freya:~/isaacardis.com/selfies2/ 
+rsync -avz ~/Pictures/self-portraits/ freya:~/isaacardis.com/selfies/
+# rsync -avz --update ~/Pictures/self-portraits2/ freya:~/isaacardis.com/selfies2/
 

@@ -12,7 +12,7 @@ do
     fi
 
     rsync -a ~/Pictures/self-portraits/ ~/$bk/self-portraits
-    rsync -a ~/Pictures/self-portraits2/ ~/$bk/self-portraits2
+    # rsync -a ~/Pictures/self-portraits2/ ~/$bk/self-portraits2
 
     echo "Backup OK: $bk $(date)"
 done

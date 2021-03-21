@@ -11,7 +11,7 @@ then
     sleep $s
 
     year_month="$(date +%y%m)"
-    mkdir -p "$HOME/Pictures/self-portraits2/${year_month}"
+    mkdir -p "$HOME/Pictures/self-portraits/${year_month}"
 
     # osx
     # imagesnap ~/Pictures/self-portraits/$d
@@ -21,5 +21,5 @@ then
 
     # linux
     /usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 \
-        "$HOME/Pictures/self-portraits2/${year_month}/$(date +%d)-$(date +%H%M).png"
+        "$HOME/Pictures/self-portraits/${year_month}/$(date +%d)-$(date +%H%M).png"
 fi
