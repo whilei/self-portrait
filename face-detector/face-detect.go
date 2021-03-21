@@ -123,7 +123,7 @@ var faceCropScale = 33 // percent bigger
 func enlargeCrop(rect image.Rectangle, maxCols, maxRows int) (nanchor image.Point, ncols, nrows int) {
 	width, height := (rect.Max.X - rect.Min.X), (rect.Max.Y - rect.Min.Y)
 	ncols = width * (100 + faceCropScale) / 100
-	nrows = width * (100 + faceCropScale) / 100
+	nrows = width * (100 + faceCropScale + 62) / 100 // golden ratio
 
 	// adjust anchor (top left == rect Min) given scaled rect size
 	x, y := rect.Min.X, rect.Min.Y
