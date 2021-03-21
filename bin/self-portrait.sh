@@ -9,7 +9,9 @@ then
     # sleep randomly bewteen 1s and 12m
     s=$(( ( RANDOM % 720 )  + 1 ))
     sleep $s
-    d="$(date +%y%m%d)-$(date +%H%M).png"
+
+    year_month="$(date +%y%m)"
+    mkdir -p "$HOME/Pictures/self-portraits2/${year_month}"
 
     # osx
     # imagesnap ~/Pictures/self-portraits/$d
@@ -18,5 +20,6 @@ then
     # screencapture -x ~/Pictures/self-screenshots/sc$d
 
     # linux
-    /usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 $HOME/Pictures/self-portraits2/$d
+    /usr/bin/fswebcam --no-subtitle --no-banner --no-timestamp -d /dev/video0 -r 640x480 --png 1 \
+        "$HOME/Pictures/self-portraits2/${year_month}/$(date +%d)-$(date +%H%M).png"
 fi
