@@ -20,13 +20,15 @@ func montage(files []string, montageIndex int) {
 	args := files
 	args = append(args, "-tile", montageTile)
 	args = append(args, "-geometry", montageGeo)
-	args = append(args, fmt.Sprintf("%s%d.png", outFilePrefix, montageIndex))
+	outFile := fmt.Sprintf("%s%d.png", outFilePrefix, montageIndex)
+	args = append(args, outFile)
 	proc := exec.Command("montage", args...)
 	out, err := proc.CombinedOutput()
 	if err != nil {
-		log.Fatalln(err)
+		log.Printf( "montage errored: %s err=%v files(%d)=%v\n", outFile, err, len(files), files)
+	} else {
+		fmt.Printf("ok: %s %s\n", outFile, string(out))
 	}
-	fmt.Printf("%s\n", string(out))
 }
 
 func run() {
