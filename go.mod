@@ -1,6 +1,6 @@
 module github.com/whilei/self-portrait
 
-go 1.15
+go 1.16
 
 require (
 	github.com/aryann/difflib v0.0.0-20170710044230-e206f873d14a
