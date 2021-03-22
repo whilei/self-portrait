@@ -5,7 +5,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"image"
@@ -50,7 +49,8 @@ func getFiles(dirIn string, filetype string) (files []string) {
 
 // remove abs path and "face_" from either/both original and face file names
 func stripFileName(name string) string {
-	return string(bytes.Replace([]byte(filepath.Base(name)), []byte("face_"), []byte(""), 1)) // remove 'face_' prefix
+	return filepath.Base(name)
+	// return string(bytes.Replace([]byte(filepath.Base(name)), []byte("face_"), []byte(""), 1)) // remove 'face_' prefix
 }
 
 func getDifferentFiles(listA, listB []string) (diff []difflib.DiffRecord) {
@@ -60,8 +60,8 @@ func getDifferentFiles(listA, listB []string) (diff []difflib.DiffRecord) {
 func getUniqueOriginals(dirIn, dirOut, filetype string) []string {
 
 	// get file list from originals
-	originals := getFiles(dirIn, ".png")
-	faces := getFiles(dirOut, ".png")
+	originals := getFiles(dirIn, filetype /*eg. .png*/)
+	faces := getFiles(dirOut, filetype /*eg. .png*/)
 	var originalsStripped = make([]string, len(originals))
 	var facesStripped = make([]string, len(faces))
 
@@ -87,7 +87,7 @@ func getUniqueOriginals(dirIn, dirOut, filetype string) []string {
 		// fmt.Printf("%s\n", diff)
 		// should only have LeftOnly's, ie only have orignals that are not in faces'
 		if diff.Delta == difflib.LeftOnly {
-			uniqueAbsPath := dirIn + diff.Payload
+			uniqueAbsPath := filepath.Join(dirIn, diff.Payload)
 			fmt.Printf("%s\n", uniqueAbsPath)
 			uniques = append(uniques, uniqueAbsPath)
 		}
@@ -232,7 +232,8 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 	l := len(inputs)
 	for i, element := range inputs {
 
-		outPath := dirOut + "face_" + filepath.Base(element)
+		// outPath := dirOut + "face_" + filepath.Base(element)
+		outPath := filepath.Join(dirOut, filepath.Base(element))
 		fmt.Println(i+1, "/", l, ":", element)
 
 		var cachedKnownNoFace bool
@@ -327,7 +328,7 @@ func main() {
 	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
 
 	// This file acts as a semi-persistent cache to avoid checking the same image for faces twice.
-	flag.StringVar(&knownEmptyStore, "empty", filepath.Join(os.TempDir(), "face-detector-nofacelist"), "file in which to store list of known no-face images")
+	flag.StringVar(&knownEmptyStore, "cache-nofacelist", filepath.Join(os.TempDir(), "face-detector-nofacelist"), "file in which to store list of known no-face images")
 
 	flag.Parse()
 
