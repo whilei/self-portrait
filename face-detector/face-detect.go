@@ -9,12 +9,11 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/png"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"image/png"
 
 	"github.com/aryann/difflib"
 	"github.com/oliamb/cutter"
@@ -194,6 +193,35 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 			f.Close()
 		}
 	}
+	// // ugly roll for the nofaces cache file
+	// defer func() {
+	// 	tail := exec.Command("tail", "-3000", nofaceslistfilePath)
+	// 	tmpFile, err := ioutil.TempFile(os.TempDir(), "no-face-tmp")
+	// 	if err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// 	stdout, err := tail.StdoutPipe()
+	// 	if err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// 	if err := tail.Start(); err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// 	buf := bytes.NewBuffer([]byte{})
+	// 	_, err = buf.ReadFrom(stdout)
+	// 	if err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// 	err = ioutil.WriteFile(tmpFile.Name(), buf.Bytes(), os.ModePerm)
+	// 	if err != nil {
+	// 		log.Fatalln(err)
+	// 	}
+	// 	if err := tail.Wait(); err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	stdout.Close()
+	// 	os.Rename(tmpFile.Name(), nofaceslistfilePath)
+	// }()
 
 	nofaceFile, err := os.OpenFile(nofaceslistfilePath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
