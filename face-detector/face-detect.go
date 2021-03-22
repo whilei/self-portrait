@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"image/png"
 
@@ -152,7 +153,7 @@ func enlargeCrop(rect image.Rectangle, maxCols, maxRows int) (nanchor image.Poin
 
 //detects faces and crops em out
 func cropFaces(inputs []string, dirOut string, harrcascade string) {
-	err := os.MkdirAll(dirOut, 0777) // makes dir if not exists
+	err := os.MkdirAll(dirOut, os.ModePerm) // makes dir if not exists
 	if err != nil {
 		fmt.Printf("Could not create directory %s\n", dirOut)
 		log.Fatal(err)
@@ -172,7 +173,7 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 	// removes a string from string slice if it exists in the slice
 	// this "widdles" the size of the in-memory known-no-faces list as previously checked files are referenced
 	// Since order is preserved, it should be relatively fast.
-	containsWiddle := func(sl []string, s string) ([]string, bool) {
+	spliceIfContains := func(sl []string, s string) ([]string, bool) {
 		for i, ss := range sl {
 			if ss == s {
 				sl = append(sl[:i], sl[i+1:]...)
@@ -206,17 +207,17 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 		outPath := dirOut + "face_" + filepath.Base(element)
 		fmt.Println(i+1, "/", l, ":", element)
 
-		var has bool
-		nofaces, has = containsWiddle(nofaces, element)
-		if has {
-			log.Println("known haz no face, skipping")
+		var cachedKnownNoFace bool
+		nofaces, cachedKnownNoFace = spliceIfContains(nofaces, element)
+		if cachedKnownNoFace {
+			log.Println("known no-face, skipping")
 			continue
 		}
 
 		imageMat := gocv.IMRead(element, gocv.IMReadColor)
 		if imageMat.Empty() {
 			log.Println("empty image, skipping", element)
-			if _, has := containsWiddle(nofaces, element); !has {
+			if _, has := spliceIfContains(nofaces, element); !has {
 				nofaceFile.WriteString(element + "\n")
 			}
 			continue
@@ -235,11 +236,12 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 		rects := classifier.DetectMultiScale(imageMat)
 		if len(rects) == 0 {
 			log.Println("no faces detected")
-			if _, has := containsWiddle(nofaces, element); !has {
+			if _, has := spliceIfContains(nofaces, element); !has {
 				nofaceFile.WriteString(element + "\n")
 			}
 			continue
 		}
+
 		fs, err := os.Open(element)
 		if err != nil {
 			panic(err)
@@ -292,12 +294,24 @@ func main() {
 	fmt.Printf("Program Name: %s\n", cmd)
 
 	flag.StringVar(&dirIn, "dirIn", "/Users/ia/dev/self-portrait/data/examples/originals/", "input directory holding selfies")
-	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/data/examples/faces/", "output directory")
+	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/data/examples/faces/", "output directory, will be create-alled if DNE")
 	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
 	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
-	flag.StringVar(&knownEmptyStore, "empty", "/Users/ia/dev/self-portrait/data/knownnofaces", "file in which to store list of known no-face images")
+
+	// This file acts as a semi-persistent cache to avoid checking the same image for faces twice.
+	flag.StringVar(&knownEmptyStore, "empty", filepath.Join(os.TempDir(), "face-detector-nofacelist"), "file in which to store list of known no-face images")
 
 	flag.Parse()
+
+	// Sanity
+	if dirIn == dirOut {
+		log.Fatalln("dirIn cannot also be dirOut")
+	}
+
+	// Sanitize
+	if !strings.HasSuffix(dirIn, string(filepath.Separator)) {
+		dirIn += string(filepath.Separator)
+	}
 
 	cropFaces(getUniqueOriginals(dirIn, dirOut, filetype), dirOut, harrcascade)
 
