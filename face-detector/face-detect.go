@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"embed"
 
 	"github.com/aryann/difflib"
 	"github.com/oliamb/cutter"
@@ -150,6 +152,9 @@ func enlargeCrop(rect image.Rectangle, maxCols, maxRows int) (nanchor image.Poin
 	return
 }
 
+//go:embed haarcascade_frontalface_alt.xml
+var haarCascadeFrontalFaceFile embed.FS
+
 //detects faces and crops em out
 func cropFaces(inputs []string, dirOut string, harrcascade string) {
 	err := os.MkdirAll(dirOut, os.ModePerm) // makes dir if not exists
@@ -163,6 +168,17 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 	// load classifier to recognize faces
 	classifier := gocv.NewCascadeClassifier()
 	defer classifier.Close()
+
+	// use embedded file if defaulty haarcascade value
+	if harrcascade == "haarcascade_frontalface_alt.xml" {
+		b, err := haarCascadeFrontalFaceFile.ReadFile("haarcascade_frontalface_alt.xml")
+		tmpFile := filepath.Join(os.TempDir(), "face-detect-haarcascade")
+		err = ioutil.WriteFile(tmpFile, b, os.ModePerm)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		harrcascade = tmpFile
+	}
 
 	if !classifier.Load(harrcascade) {
 		fmt.Printf("Error reading cascade file: %v\n", harrcascade)
@@ -234,7 +250,7 @@ func cropFaces(inputs []string, dirOut string, harrcascade string) {
 
 		// outPath := dirOut + "face_" + filepath.Base(element)
 		outPath := filepath.Join(dirOut, filepath.Base(element))
-		fmt.Println(i+1, "/", l, ":", element)
+		fmt.Printf("%d/%d: %s\n", i+1, l, element)
 
 		var cachedKnownNoFace bool
 		nofaces, cachedKnownNoFace = spliceIfContains(nofaces, element)
@@ -322,17 +338,21 @@ func main() {
 
 	fmt.Printf("Program Name: %s\n", cmd)
 
-	flag.StringVar(&dirIn, "dirIn", "/Users/ia/dev/self-portrait/data/examples/originals/", "input directory holding selfies")
-	flag.StringVar(&dirOut, "dirOut", "/Users/ia/dev/self-portrait/data/examples/faces/", "output directory, will be create-alled if DNE")
-	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
-	flag.StringVar(&harrcascade, "harrcascade", "/Users/ia/gocode/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml", "harrcascade thing")
+	// These options are mandatory.
+	flag.StringVar(&dirIn, "dirIn", "", "input directory holding selfies")
+	flag.StringVar(&dirOut, "dirOut", "", "output directory, will be create-alled if DNE")
 
-	// This file acts as a semi-persistent cache to avoid checking the same image for faces twice.
+	// These options can be left empty to defaults.
+	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
+	flag.StringVar(&harrcascade, "harrcascade", "haarcascade_frontalface_alt.xml", "harrcascade thing")
 	flag.StringVar(&knownEmptyStore, "cache-nofacelist", filepath.Join(os.TempDir(), "face-detector-nofacelist"), "file in which to store list of known no-face images")
 
 	flag.Parse()
 
 	// Sanity
+	if dirIn == "" || dirOut == "" {
+		log.Fatalln("neither -dirIn nor -dirOut can be empty")
+	}
 	if dirIn == dirOut {
 		log.Fatalln("dirIn cannot also be dirOut")
 	}

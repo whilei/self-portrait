@@ -2,7 +2,7 @@
 
 go run face-detector/face-detect.go \
   --dirIn "$(pwd)/data/examples/originals-2103/" \
-  --dirOut "$(pwd)/data/examples/faces-2103/" \
-  --harrcascade /home/ia/dev/go-opencv/go-opencv/samples/haarcascade_frontalface_alt.xml \
-  --empty "$(pwd)/data/knownnofaces"
+  --dirOut "$(pwd)/data/examples/originals-2103/faces/" \
+  --cache-nofacelist "$(pwd)/data/knownnofaces"
 
+  # --harrcascade /home/ia/dev/go-opencv/go-opencv/samples/haarcascade_frontalface_alt.xml \
