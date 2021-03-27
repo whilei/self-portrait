@@ -11,7 +11,28 @@ import (
 	"strings"
 )
 
+/*
+Inputs:
+
+- A directory which will be walked.
+  Only -png files will be read, any other file extensions will be skipped.
+- Montage file configuration and naming parameters.
+
+Outputs:
+
+- Possibly multiple montage PNG files.
+  Montage file names are suffixed with a 1-indexed index value immediately preceding the extension, eg. _%d.png.
+- The number of tiled imaged in each montage file is determined by the arithmetic of the geometry.
+- The last montage file may not be completely full of images; if the number of eligible tiling images N % montageMax != 0.
+
+Limits:
+
+- PNG file acceptance for the walk function is hardcoded.
+
+ */
+
 var dirIn string
+var dirOut string
 var montageMax = 64 // will be calculated from tile configuration (eg. 8 * 8 = 64)
 var montageTile = "8x8"
 var montageGeo = "32x32+1+1"
@@ -24,6 +45,7 @@ func montage(files []string, montageIndex int) {
 
 	// This is how the resulting montage file will be named.
 	outFile := fmt.Sprintf("%s_%s_%d.png", outFilePrefix, montageTile, montageIndex)
+	outFile = filepath.Join(dirOut, outFile)
 
 	args = append(args, outFile)
 	proc := exec.Command("montage", args...)
@@ -88,12 +110,28 @@ func run() {
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	flag.StringVar(&dirIn, "dirIn", "", "input directory holding images to montage")
+	flag.StringVar(&dirOut, "dirOut", "", "output directory for montage images (will be created if not existing; defaults to dirIn if not used)")
 	// flag.IntVar(&montageMax, "montage-max", 64, "Max number of images per montage")
 	flag.StringVar(&montageTile, "montage-tile", "8x8", "Tile dimensions for montage")
 	flag.StringVar(&montageGeo, "montage-geo", "64x64+1+1", "Geometry for each montage image")
 	flag.StringVar(&outFilePrefix, "montage-file-pre", "montage", "File prefix for each montaged file (eg. montage-prefix-1.png, montage-prefix-2.png)")
 
 	flag.Parse()
+
+	if dirIn == "" {
+		log.Fatal("-dirIn cannot be empty")
+	}
+
+	if dirOut == "" {
+		dirOut = dirIn
+	}
+	if fi, err := os.Stat(dirOut); os.IsNotExist(err) {
+		os.MkdirAll(dirOut, os.ModePerm)
+	} else if err != nil {
+		panic(err)
+	} else if !fi.IsDir() {
+		panic("is not a directory: " + dirOut)
+	}
 
 	run()
 }
