@@ -5,6 +5,7 @@ package main
 
 import (
 	"bufio"
+	"embed"
 	"flag"
 	"fmt"
 	"image"
@@ -14,7 +15,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"embed"
 
 	"github.com/aryann/difflib"
 	"github.com/oliamb/cutter"
@@ -26,6 +26,7 @@ var dirOut string
 var filetype string
 var harrcascade string
 var knownEmptyStore string
+var cropDeltaX, cropDeltaY int
 
 // Exists reports whether the named file or directory exists.
 // apparently this can be wrong if permissions or something else thangle with it, would say true when not
@@ -121,11 +122,20 @@ func readFileLinesToStrSlice(fpath string) (out []string) {
 	return out
 }
 
-var faceCropScale = 33 // percent bigger
+// enlargeCop enlarges the detected face region.
+// The detected region will almost always be nearly a square.
 func enlargeCrop(rect image.Rectangle, maxCols, maxRows int) (nanchor image.Point, ncols, nrows int) {
 	width, height := (rect.Max.X - rect.Min.X), (rect.Max.Y - rect.Min.Y)
-	ncols = width * (100 + faceCropScale) / 100
-	nrows = width * (100 + faceCropScale + 62) / 100 // golden ratio
+
+	// A: (orig, square that dont cut off chin)
+	// 33
+	// 33
+	// B: (aka. Golden Ratio)
+	// 33
+	// 33 + 62
+	// C: Was a little mysterious looking on averages.
+	ncols = width * (100 + cropDeltaX) / 100 // eg. 10,
+	nrows = width * (100 + cropDeltaY) / 100 //     72
 
 	// adjust anchor (top left == rect Min) given scaled rect size
 	x, y := rect.Min.X, rect.Min.Y
@@ -346,6 +356,12 @@ func main() {
 	flag.StringVar(&filetype, "filetype", ".png", "file type to detect faces, searches input directory")
 	flag.StringVar(&harrcascade, "harrcascade", "haarcascade_frontalface_alt.xml", "harrcascade thing")
 	flag.StringVar(&knownEmptyStore, "cache-nofacelist", filepath.Join(os.TempDir(), "face-detector-nofacelist"), "file in which to store list of known no-face images")
+
+	// Explanation of defaults: +10 on X grows the frame beyond the edges of the eyes (and chin).
+	//                          +72 on Y is +10+62, where +62 is approx the golden ratio.
+	//                          Warning: the golden ratio is a magic number.
+	flag.IntVar(&cropDeltaX, "crop-delta-x", 10, "modify crop ratio x axis (columns)")
+	flag.IntVar(&cropDeltaY, "crop-delta-y", 72, "modify crop ratio y axis (rows)")
 
 	flag.Parse()
 

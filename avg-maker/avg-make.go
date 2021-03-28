@@ -28,6 +28,9 @@ func run() {
 		if err != nil {
 			return err
 		}
+		if info.IsDir() {
+			return nil
+		}
 		if ext := filepath.Ext(path); !strings.HasSuffix(ext, "png") {
 			log.Printf("Skipping (not .png): %s\n", path)
 			return nil

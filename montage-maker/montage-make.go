@@ -92,8 +92,15 @@ func run() {
 		if err != nil {
 			return err
 		}
+		if info.IsDir() {
+			return nil
+		}
 		if ext := filepath.Ext(path); !strings.HasSuffix(ext, "png") {
 			log.Printf("Skipping (not .png): %s\n", path)
+			return nil
+		}
+		if base := filepath.Base(path); strings.HasPrefix(base, outFilePrefix) {
+			log.Printf("Skipping (is montage): %s\n", path)
 			return nil
 		}
 		batch = append(batch, path)
@@ -112,6 +119,7 @@ func main() {
 	flag.StringVar(&dirIn, "dirIn", "", "input directory holding images to montage")
 	flag.StringVar(&dirOut, "dirOut", "", "output directory for montage images (will be created if not existing; defaults to dirIn if not used)")
 	// flag.IntVar(&montageMax, "montage-max", 64, "Max number of images per montage")
+	// width x height
 	flag.StringVar(&montageTile, "montage-tile", "8x8", "Tile dimensions for montage")
 	flag.StringVar(&montageGeo, "montage-geo", "64x64+1+1", "Geometry for each montage image")
 	flag.StringVar(&outFilePrefix, "montage-file-pre", "montage", "File prefix for each montaged file (eg. montage-prefix-1.png, montage-prefix-2.png)")
