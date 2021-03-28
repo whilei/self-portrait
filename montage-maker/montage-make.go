@@ -48,7 +48,8 @@ func montage(files []string, montageIndex int) {
 	outFile = filepath.Join(dirOut, outFile)
 
 	args = append(args, outFile)
-	proc := exec.Command("montage", args...)
+	args = append([]string{"montage"}, args...)
+	proc := exec.Command("magick", args...)
 	out, err := proc.CombinedOutput()
 	if err != nil {
 		log.Printf( "montage errored: %s err=%v files(%d)=%v\n", outFile, err, len(files), files)
