@@ -47,10 +47,9 @@ func run() {
 		}
 
 		procResizeArgs = append(procResizeArgs, resizeTarget)
-		procResizeArgs = append([]string{"convert"}, procResizeArgs...)
 
 		// Resize the image to standard dimensions.
-		procResize := exec.Command("magick", procResizeArgs...)
+		procResize := exec.Command("convert", procResizeArgs...)
 
 		out, err := procResize.CombinedOutput()
 		if err != nil {
@@ -68,7 +67,7 @@ func run() {
 
 		// For all later files, run the averaging command between the
 		// target image file and the standard-resized temporary image.
-		procFx := exec.Command("magick", "convert", resizeTarget, fileOut,
+		procFx := exec.Command("convert", resizeTarget, fileOut,
 
 			// This flag is magic.
 			// I don't remember what its doing, just working from my shell script as a reference.
