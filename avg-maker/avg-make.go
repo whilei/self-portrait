@@ -35,6 +35,10 @@ func run() {
 			log.Printf("Skipping (not .png): %s\n", path)
 			return nil
 		}
+		if strings.Contains(filepath.Base(path), "montage") {
+			log.Printf("Skipping (is montage): %s\n", path)
+			return nil
+		}
 		defer func() { i++ }()
 
 		procResizeArgs := append([]string{path}, convertResizeStaticArgs...)
